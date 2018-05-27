@@ -1,25 +1,30 @@
 var rectangleColor = '#0099ff';
-var ws = new WebSocket("ws://localhost:80/ws")
-
+var ws = new WebSocket("ws://66.75.229.184:80/ws")
 var workingPictureID;
+    
 
 ws.onopen = function(){
 	console.log("Connected")
+	ws.send("1")
+}
+
+var jsonObj = {
+	labels: [],
+	pictureID: null
 }
 
 ws.onmessage = function (event) {
 	//console.log(event.data);
 	if("Data".localeCompare(event.data.slice(0,4)) == 0){
-		console.log("Got Message");
 		var isPictureID = "ID".localeCompare(event.data.slice(5,7))
 		if(isPictureID == 0){
-			workingPictureID = event.data.slice(7, event.data.length)
+			workingPictureID = event.data.slice(8, event.data.length)
+			jsonObj["pictureID"] = workingPictureID;
 		}else{
-			console.log("Got Image Data")
 			var src = "data:image/png;base64,"
 			src += event.data.slice(4, event.data.length)
 			var canvas = document.getElementById("canvas")
-			canvas.style.backgroundImage = "url('" + src + "')"
+			canvas.style.background = "url('" + src + "')"
 			
 		}
 	}else{
@@ -29,29 +34,38 @@ ws.onmessage = function (event) {
 }
 
 function getNewImage(){
+	ws.send("2" + JSON.stringify(jsonObj))
 	ws.send("1");
+	clearJson();
+	clearLabels();
 }
 
+function getPreviousImage(){
+	ws.send("3");
+}
+
+function clearJson(){
+	jsonObj = {
+		labels: [],
+		pictureID: null
+	}
+}
 
 // Detects mouse movement on the canvas to draw the rectangles.
 function initDraw(canvas) {
-    var jsonObj = {
-        labels: [],
-        pictureID: null
-    }
-    
-    console.log(jsonObj)
-    
+
     function setMousePosition(e) {
         var ev = e || window.event; //Moz || IE
         if (ev.pageX) { //Moz
-            mouse.x = ev.pageX + window.pageXOffset;
-            mouse.y = ev.pageY + window.pageYOffset;
+            mouse.x = e.offsetX
+            mouse.y = e.offsetY
         } else if (ev.clientX) { //IE
-            mouse.x = ev.clientX + document.body.scrollLeft;
-            mouse.y = ev.clientY + document.body.scrollTop;
+            mouse.x = ev.offsetX
+            mouse.y = ev.offsetY
         }
     }
+	
+
 
     var mouse = {
         x: 0,
@@ -60,20 +74,43 @@ function initDraw(canvas) {
         startY: 0
     };
     var element = null;
-    var bool = true;
+    var clickedOnce = false;
     var classID;
+	var ctx = canvas.getContext("2d")
+	ctx.canvas.width = 808
+	ctx.canvas.height = 608
 
     canvas.onmousemove = function (e) {
         setMousePosition(e);
-        if (element !== null) {
-            element.style.width = Math.abs(mouse.x - mouse.startX) + 'px';
-            element.style.height = Math.abs(mouse.y - mouse.startY) + 'px';
-            element.style.left = (mouse.x - mouse.startX < 0) ? mouse.x + 'px' : mouse.startX + 'px';
-            element.style.top = (mouse.y - mouse.startY < 0) ? mouse.y + 'px' : mouse.startY + 'px';
-        }
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		ctx.strokeStyle = "#FF0000"
+		ctx.beginPath()
+		ctx.moveTo(0, e.offsetY)
+		ctx.lineTo(canvas.width, e.offsetY)
+		ctx.moveTo(e.offsetX, 0)
+		ctx.lineTo(e.offsetX, canvas.height)
+		ctx.stroke()
+		ctx.strokeStyle = "#0000FF"
+		
+		if(clickedOnce){
+			ctx.strokeRect(mouse.startX, mouse.startY, e.offsetX - mouse.startX, e.offsetY - mouse.startY)
+		}
+		
+		
+		for(i = 0; i < jsonObj["labels"].length; i++){
+			ctx.strokeRect(jsonObj["labels"][i][1],jsonObj["labels"][i][2], jsonObj["labels"][i][3], jsonObj["labels"][i][4])
+		}
+		
     };
 
     canvas.onclick = function (e) {
+		if(e.which == 3){
+			if(clickedOnce){
+				clickedOnce = false
+				return
+			}
+		}
         if (element !== null) {
             element = null;
             canvas.style.cursor = "default";
@@ -88,21 +125,15 @@ function initDraw(canvas) {
             canvas.appendChild(element);
             canvas.style.cursor = "crosshair";
         }
-        if (bool == false) {
-            console.log("StartX: " + mouse.startX);
-            console.log("StartY: " + mouse.startY);
-            console.log("X: " + mouse.x);
-            console.log("Y: " + mouse.y);
-            console.log('labels: ' + JSON.stringify(jsonObj));
+        if (clickedOnce == true) {
             var e = document.getElementById('dropdown');
             strClassID = e.options[e.selectedIndex].getAttribute('id');
             classID = parseInt(strClassID)
 
-            jsonObj['labels'].push([classID, mouse.startX, mouse.startY, mouse.x, mouse.y]);
+            jsonObj['labels'].push([classID, mouse.startX, mouse.startY, mouse.x - mouse.startX, mouse.y-mouse.startY]);
             
-            console.log(JSON.stringify(jsonObj))
-            bool = true;
-        } else bool = false;
+            clickedOnce = false;
+        } else clickedOnce = true;
         
         
         
@@ -115,26 +146,6 @@ function initDraw(canvas) {
 // Deletes each child of the canvas object individually using removeChild()
 // Can be modified to remove just the most recent child, oldest child, etc.
 function clearLabels() {
-	var canv = document.getElementById('canvas');
-	while (canv.firstChild) {
-    	canv.removeChild(canv.firstChild);
-	}
+	clearJson()
 }
 
-
-// Change the color of the rectangle depending on the item selected in the drop down.
-function changeColor() {
-	var value = document.getElementById('dropdown').value;
-	if(value === 'one') {
-		rectangleColor = '#0099ff'; //blue
-	} else if(value === 'two') {
-		rectangleColor = '#29a329'; //green
-	} else if(value === 'three') { 
-		rectangleColor = '#ffb3d9'; //pink
-	} else if(value === 'four') {
-		rectangleColor = '#ffa64d'; //orange
-	} else if(value === 'five') {
-		rectangleColor = '#ffff66'; //yellow
-	}
-    
-}

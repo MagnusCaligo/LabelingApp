@@ -36,7 +36,7 @@ select {
 	width: 808px;
 	height: 608px;
 	border: 1px solid;
-	background-image: url(images/3446.JPEG);
+	background: url(images/3446.JPEG);
 }
 
 .rectangle {

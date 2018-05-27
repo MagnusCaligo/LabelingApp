@@ -9,29 +9,19 @@ import random
 import os
 import sys
 
-clients = []
 
-class MySocket(web.RequestHandler):
+class MyHandler(web.RequestHandler):
 	def check_origin(self, origin):
 		return True
 		
 	def get(self):
 		print "Person Connected!"
 		self.render("index.html")
-		if not self in clients:
-			clients.append(self)
+
 		
 	def onClose(self):
 		print "Someone left :("
-		if self in clients:
-			clients.remove(self)
-			
-	def on_message(self, message):
-		print "Got Message from Client"
-		if message[0] == "1": # If we get a request for images
-			sendImage(self)
-		elif message[1] == "2": #If we get JSON Data
-			pass
+
 		
 class MyWebSocketHandler(websocket.WebSocketHandler):
 	def check_origin(self, origin):
@@ -39,66 +29,64 @@ class MyWebSocketHandler(websocket.WebSocketHandler):
 		
 	def open(self):
 		print "Web Socket Connected"
+		self.pictureStack = []
 		
 	def onClose(self):
 		print "Someone left :("
-		if self in clients:
-			clients.remove(self)
 			
 	def on_message(self, message):
-		print "Got Message from Client"
 		if message[0] == "1": # If we get a request for images
-			sendImage(self)
-		elif message[1] == "2": #If we get JSON Data
-			pass
+			self.sendImage()
+		elif message[0] == "2": #If we get JSON Data
+			message = message[1:]
+			print "Got JSON Message: ", message
+			recieveJson(message)
+		elif message[0] == "3": #Go back an image on the stack
+			if len(self.pictureStack) > 1:
+				self.pictureStack.pop()
+				self.sendImage(self.pictureStack[len(self.pictureStack)-1])
+			
 		
-
+	def sendImage(self, *imageName):
+		fileName = ""
+		if len(imageName) == 0:
+			fileName = random.choice(os.listdir("./unlabeledImages/"))
+			self.pictureStack.append(fileName)
+			fileName = "./unlabeledImages/" + fileName
+		else:
+			if imageName[0] in os.listdir("./labeledImages/"):
+				fileName = "./labeledImages/" + imageName[0]
+			elif imageName[0] in os.listdir("./unlabeledImages/"):
+				fileName = "./unlabeledImages/" + imageName[0]
+			else:
+				return
+		pictureID = fileName.split("/")[2].split(".")[0]
+		self.write_message("Data ID " + pictureID)
+		with open(fileName, "rb") as imageFile:
+			encoded_string = base64.b64encode(imageFile.read())	
+		self.write_message("Data" + encoded_string.encode('utf8'))
 		
 	
 
 #moves fileName from unlabeled to labeled
 def moveFile(fileName):
-    destination = os.getcwd() + "/labeled"
-    source = os.getcwd() + "/unlabeled"
-    files = source + "/" + fileName
+    if fileName not in os.listdir("./unlabeledImages/"):
+        return
+    destination = os.getcwd() + "/labeledImages/"
+    source = os.getcwd() + "/unlabeledImages/"
+    files = source + fileName
     shutil.move(files,destination)
-    print("Moving file")
 
-
-#takes in a socket object as a parameter
-def sendImage(conn):
-		fileName = random.choice(os.listdir("./unlabeledImages/"))
-		pictureID = fileName.split(".")[0]
-		conn.write_message("Data ID " + pictureID)
-		with open("./unlabeledImages/" + fileName, "rb") as imageFile:
-			encoded_string = base64.b64encode(imageFile.read())	
-		conn.write_message("Data" + encoded_string.encode('utf8'))
-		print("Done sending")
-    
-
-def formatJson(conn):
-    data = conn.recv(1024)
-    buf = data.decode('utf-8')
-    count = 0
-    while (data):
-        print(count)
-        count += 1
-        data = conn.recv(1024)
-        buf += data.decode('utf-8')
-    
-    return buf
-
-def recieveJson(conn):
-    JsonObj = json.loads(formatJson(conn))
-    print("Picture ID: ", JsonObj['pictureID'])
-    print(JsonObj)
+def recieveJson(jsonString):
+    JsonObj = json.loads(jsonString)
     picID = JsonObj['pictureID']
     txtName = str(picID) + '.txt'
-    files = open(txtName, 'w')
+    files = open("./labels/" + txtName, 'w')
 
     for arr in JsonObj['labels']:
         for element in arr:
             files.write(str(element) + ', ')
+        files.write("\n")
 
     moveFile(str(picID) + '.png')
 		
@@ -108,7 +96,7 @@ class MyStaticFileHandler(web.StaticFileHandler):
         self.set_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
 
 if __name__ == '__main__':
-	app = web.Application([ (r'/', MySocket),(r"/", MyWebSocketHandler), (r"/ws", MyWebSocketHandler),(r"/(.*)", MyStaticFileHandler, {"path": ".", "default_filename":"index.html"}),
+	app = web.Application([ (r'/', MyHandler),(r"/", MyWebSocketHandler), (r"/ws", MyWebSocketHandler),(r"/(.*)", MyStaticFileHandler, {"path": ".", "default_filename":"index.html"}),
 	(r"/script.js", MyStaticFileHandler, {"path": ".", "default_filename":"index.html"})])
 	app.listen(80)
 	#ioloop.IOLoop.instance().add_handler(sys.stdin, onInput, ioloop.IOLoop.READ)

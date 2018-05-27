@@ -8,25 +8,50 @@
 </head>
 
 <body>
-	<div id="menu" onchange="changeColor()">
+	Directions: <br><br>
+	
+	1. Select the correct label from the drop down below<br>
+	2. Drag your cursor to the corner of an object using the convenient vertical and horizontal lines<br>
+	3. Click<br>
+	4. Drag your cursor to the other corner using the lines.<br>
+	5. Click<br><br>
+	
+	If you mess up on a label click "Clear Labels". We don't have a way to remove a specific label yet. <br>
+	If you are unsure how to label an image, refresh the page and you will get a new image. We will deal with the 'weird' images once the rest have been labeled. <br>
+	
+	If you have any questions or concerns forward them to me on Slack. <br><br>
+	
+	<div id="menu">
 		<select id="dropdown">
-			<option id="1" value="one">Roulette</option>
-			<option id="2" value="two">Dice 1</option>
-			<option id="3" value="three">Dice 2</option>
-			<option id="4" value="four">Dice 3</option>
-			<option id="5" value="five">Dice 3</option>
-			<option id="6" value="six">Dice 3</option>
+			<option id="1" >Dice 1</option>
+			<option id="2" >Dice 2</option>
+			<option id="3" >Dice 3</option>
+			<option id="4" >Dice 4</option>
+			<option id="5" >Dice 5</option>
+			<option id="6" >Dice 6</option>
+			<option id="7" >Roulette</option>
+			<option id="8" >Cherry (Torpedo Board)</option>
+			<option id="9" >Banana (Torpedo Board)</option>
+			<option id="10" >Grape (Torpedo Board</option>
+			<option id="11" >Full Board</option>
+			<option id="12" >Top Left Hole</option>
+			<option id="13" >Top Right Hole</option>
+			<option id="14" >Bottom Hole</option>
+			<option id="15" >Qualification Gate Arm</option>
+			<option id="16" >Qualification Gate Top</option>
+			<option id="17" >Entry Gate Arm</option>
+			<option id="18" >Entry Gate Top</option>
 		</select>
 	</div>
-	<br /><br />
-	<div id="canvas">
+	<br>
+	<canvas id="canvas">
 	  <script>
 		  initDraw(document.getElementById('canvas'));
 		  
 	  </script>
-	</div>
+	</canvas>
 	<div id="clear" onClick="clearLabels()"></div>
-	<div id="previous"></div>
+	<div id="previous" onClick="getPreviousImage()"></div>
 	<div id="next" onClick="getNewImage()"></div>
 </body>
 </html>

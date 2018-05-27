@@ -1,0 +1,77 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+	font-size: 16px;
+	width: 95%;
+}
+
+h1 {
+	font-size: 30px;
+	font-weight: bold;
+	margin: 5px;
+}
+
+#menu {
+	position: relative;
+	width: 153px;
+	height: 26px;
+}
+
+select {
+	font-size: 20px;
+}
+
+#imageHolder {
+	position: absolute;
+	left: 250px;
+	width: 808px;
+	height: 608px;
+	background-image: url(images/imageHolder.png);
+	cursor: crosshair;
+}
+
+#canvas {
+	width: 808px;
+	height: 608px;
+	border: 1px solid;
+	background-image: url(images/3446.JPEG);
+}
+
+.rectangle {
+    border: 2px solid;
+	border-color: #0099ff;
+    position: absolute;
+}
+
+#next {
+	position: absolute;
+	left: 828px;
+	top: 223px;
+	width: 208px;
+	height: 66px;
+	background-image: url(images/next.png);
+	cursor: pointer;
+}
+
+#previous {
+	position: absolute;
+	left: 828px;
+	top: 316px;
+	width: 208px;
+	height: 66px;
+	background-image: url(images/previous.png);
+	margin-bottom: 50px;
+	cursor: pointer;
+}
+
+#clear {
+	position: absolute;
+	left: 828px;
+	top: 458px;
+	width: 158px;
+	height: 50px;
+	background-image: url(images/clear.png);
+	cursor: pointer;
+}

@@ -81,6 +81,9 @@ def recieveJson(jsonString):
     JsonObj = json.loads(jsonString)
     picID = JsonObj['pictureID']
     txtName = str(picID) + '.txt'
+    if picID == None or picID == "Null" or picID == "null":
+		print "Picture id is Weird, what is it saving as?"
+		print "Saving as", txtName
     files = open("./labels/" + txtName, 'w')
 
     for arr in JsonObj['labels']:

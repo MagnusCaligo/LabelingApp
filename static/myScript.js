@@ -10,11 +10,11 @@ ws.onopen = function(){
 
 var jsonObj = {
 	labels: [],
-	pictureID: null
+	pictureID: null,
+	creditor: null
 }
 
 ws.onmessage = function (event) {
-	//console.log(event.data);
 	if("Data".localeCompare(event.data.slice(0,4)) == 0){
 		var isPictureID = "ID".localeCompare(event.data.slice(5,7))
 		if(isPictureID == 0){
@@ -27,13 +27,22 @@ ws.onmessage = function (event) {
 			canvas.style.background = "url('" + src + "')"
 			
 		}
+	}else if("Leaders".localeCompare(event.data.slice(0,6))){
+		//console.log("Got Leaders " + event.data.slice(8, event.data.length))
+		var leaders = event.data.slice(8, event.data.length).split(" ")
+		document.getElementById("rank1").innerHTML = "1. " + leaders[0]
+		document.getElementById("rank2").innerHTML = "2. " + leaders[1]
+		document.getElementById("rank3").innerHTML = "3. " + leaders[2]
 	}else{
-		
+		console.log("Message was " + event.data) 
 	}
 
 }
 
 function getNewImage(){
+	jsonObj["creditor"] = document.getElementById('name').value
+	//console.log(JSON.stringify(jsonObj))
+	//console.log(document.getElementById('name').firstElementChild.value)
 	ws.send("2" + JSON.stringify(jsonObj))
 	ws.send("1");
 	clearJson();
@@ -41,13 +50,15 @@ function getNewImage(){
 }
 
 function getPreviousImage(){
-	ws.send("3");
+	ws.send("3" + document.getElementById("name").value);
 }
 
 function clearJson(){
+	picID = jsonObj["pictureID"]
 	jsonObj = {
 		labels: [],
-		pictureID: null
+		pictureID: picID,
+		creditor: null
 	}
 }
 

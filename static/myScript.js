@@ -1,5 +1,5 @@
 var rectangleColor = '#0099ff';
-var ws = new WebSocket("ws://localhost:80/ws")
+var ws = new WebSocket("ws://66.75.229.184:80/ws")
 var workingPictureID;
 
 document.onkeypress = myKeyPress
@@ -148,13 +148,17 @@ ws.onmessage = function (event) {
 			var canvas = document.getElementById("canvas")
 			canvas.style.background = "url('" + src + "')"
 		}
-	}else if("Labels".localeCompare(event.data.slice(0,7))){
+	}else if("Labels".localeCompare(event.data.slice(0,7)) == 0){
         labs = event.data.split(" ")
         console.log("Got Labels:")
         var dat = [Number(labs[1]), Number(labs[2]), Number(labs[3]), Number(labs[4]), Number(labs[5])]
         console.log(dat)
+		if(isNaN(labs[1])){
+			console.log("Values were NaN")
+			return
+		}
         jsonObj['labels'].push(dat);
-	}else if("Leaders".localeCompare(event.data.slice(0,6))){
+	}else if("Leaders".localeCompare(event.data.slice(0,7)) == 0){
 		//console.log("Got Leaders " + event.data.slice(8, event.data.length))
 		var leaders = event.data.slice(8, event.data.length).split(" ")
 		document.getElementById("rank1").innerHTML = "1. " + leaders[0]

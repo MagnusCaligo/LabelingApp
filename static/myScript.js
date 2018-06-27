@@ -157,6 +157,11 @@ ws.onmessage = function (event) {
 			console.log("Values were NaN")
 			return
 		}
+
+        if (isNaN(Number(labs[1]))){
+            console.log("Values were NaN")
+            return
+        }
         jsonObj['labels'].push(dat);
 	}else if("Leaders".localeCompare(event.data.slice(0,7)) == 0){
 		//console.log("Got Leaders " + event.data.slice(8, event.data.length))

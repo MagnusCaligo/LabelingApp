@@ -153,6 +153,11 @@ ws.onmessage = function (event) {
         console.log("Got Labels:")
         var dat = [Number(labs[1]), Number(labs[2]), Number(labs[3]), Number(labs[4]), Number(labs[5])]
         console.log(dat)
+        if (isNaN(Number(labs[1]))){
+            console.log("Values were NaN")
+            return
+        }
+
         jsonObj['labels'].push(dat);
 	}else if("Leaders".localeCompare(event.data.slice(0,6))){
 		//console.log("Got Leaders " + event.data.slice(8, event.data.length))

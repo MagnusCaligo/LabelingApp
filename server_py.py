@@ -49,6 +49,7 @@ class MyWebSocketHandler(websocket.WebSocketHandler):
 		
 	def sendImage(self, *imageName):
 		fileName = ""
+                labels = []
 		if len(imageName) == 0:
 			fileName = random.choice(os.listdir("./unlabeledImages/"))
 			self.pictureStack.append(fileName)
@@ -62,6 +63,13 @@ class MyWebSocketHandler(websocket.WebSocketHandler):
 				return
 		pictureID = fileName.split("/")[2].split(".")[0]
 		self.write_message("Data ID " + pictureID)
+                if os.path.isfile("./labels/" + str(pictureID) + ".txt"):
+                    labelFile = open("./labels/" + str(pictureID) +".txt")
+                    line = labelFile.readline()
+                    while line:
+                        line = (line.replace(",","")).replace("\n","")
+                        self.write_message("Labels " + line)
+                        line = labelFile.readline()
 		with open(fileName, "rb") as imageFile:
 			encoded_string = base64.b64encode(imageFile.read())	
 		self.write_message("Data" + encoded_string.encode('utf8'))

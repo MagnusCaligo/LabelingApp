@@ -1,5 +1,5 @@
 var rectangleColor = '#0099ff';
-var ws = new WebSocket("ws://66.75.229.184:80/ws")
+var ws = new WebSocket("ws://localhost:80/ws")
 var workingPictureID;
     
 
@@ -25,11 +25,14 @@ ws.onmessage = function (event) {
 			src += event.data.slice(4, event.data.length)
 			var canvas = document.getElementById("canvas")
 			canvas.style.background = "url('" + src + "')"
-			
 		}
+	}else if("Labels".localeCompare(event.data.slice(0,7))){
+        labs = event.data.split(" ")
+        console.log(labs)
+        jsonObj['labels'].push([Number(labs[1]), Number(labs[2]), Number(labs[2]), Number(labs[4]), Number(labs[5]) ]);
 	}else{
-		
-	}
+        console.log("Got something")
+    }
 
 }
 

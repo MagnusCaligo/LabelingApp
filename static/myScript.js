@@ -1,5 +1,5 @@
 var rectangleColor = '#0099ff';
-var ws = new WebSocket("ws://localhost:80/ws")
+var ws = new WebSocket("ws://66.75.229.184:80/ws")
 var workingPictureID;
 
 document.onkeypress = myKeyPress
@@ -137,7 +137,6 @@ function myKeyPress(e){
 
 ws.onmessage = function (event) {
     document.getElementById('canvas').redraw()
-    console.log("Test: " + event.data.slice(0,7))
 	if("Data".localeCompare(event.data.slice(0,4)) == 0){
 		var isPictureID = "ID".localeCompare(event.data.slice(5,7))
 		if(isPictureID == 0){
@@ -154,18 +153,26 @@ ws.onmessage = function (event) {
         console.log("Got Labels:")
         var dat = [Number(labs[1]), Number(labs[2]), Number(labs[3]), Number(labs[4]), Number(labs[5])]
         console.log(dat)
+		if(isNaN(labs[1])){
+			console.log("Values were NaN")
+			return
+		}
+
         if (isNaN(Number(labs[1]))){
             console.log("Values were NaN")
             return
         }
-
         jsonObj['labels'].push(dat);
 	}else if("Leaders".localeCompare(event.data.slice(0,7)) == 0){
-		console.log("Got Leaders " + event.data.slice(8, event.data.length))
+		//console.log("Got Leaders " + event.data.slice(8, event.data.length))
 		var leaders = event.data.slice(8, event.data.length).split(" ")
 		document.getElementById("rank1").innerHTML = "1. " + leaders[0]
 		document.getElementById("rank2").innerHTML = "2. " + leaders[1]
 		document.getElementById("rank3").innerHTML = "3. " + leaders[2]
+	}else if("#Imgs".localeCompare(event.data.slice(0,5)) == 0){
+        console.log("Got img number")
+        var dat = event.data.split(" ")
+        document.getElementById("numOfImages").innerHTML = "Number of Images Left: " + dat[1]
 	}else{
 		console.log("Message was " + event.data) 
 	}

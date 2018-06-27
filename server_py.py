@@ -105,6 +105,9 @@ class MyWebSocketHandler(websocket.WebSocketHandler):
 			self.write_message("Leaders " + leaders[0] + " " + leaders[1] + " " + leaders[2])
 		else:
 			print "No leader data"
+
+                numOfImages = len(os.listdir("./unlabeledImages"))
+                self.write_message("#Imgs " + str(numOfImages))
 		
 	def getLeaders(self):
 		creditors = open("creditors.txt", "r")

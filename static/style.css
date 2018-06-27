@@ -93,3 +93,11 @@ select {
 	height: 50px;
 	cursor: pointer;
 }
+#numOfImages {
+	position: absolute;
+	left: 828px;
+	top: 800px;
+	width: 158px;
+	height: 50px;
+	cursor: pointer;
+}

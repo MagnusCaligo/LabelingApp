@@ -48,7 +48,7 @@ select {
 #next {
 	position: absolute;
 	left: 828px;
-	top: 223px;
+	top: 323px;
 	width: 208px;
 	height: 66px;
 	background-image: url(images/next.png);
@@ -58,7 +58,7 @@ select {
 #previous {
 	position: absolute;
 	left: 828px;
-	top: 316px;
+	top: 416px;
 	width: 208px;
 	height: 66px;
 	background-image: url(images/previous.png);
@@ -69,7 +69,7 @@ select {
 #clear {
 	position: absolute;
 	left: 828px;
-	top: 458px;
+	top: 558px;
 	width: 158px;
 	height: 50px;
 	background-image: url(images/clear.png);
@@ -79,7 +79,7 @@ select {
 #nameInput {
 	position: absolute;
 	left: 828px;
-	top: 600px;
+	top: 700px;
 	width: 158px;
 	height: 50px;
 	cursor: pointer;
@@ -88,7 +88,7 @@ select {
 #ranks {
 	position: absolute;
 	left: 828px;
-	top: 650px;
+	top: 750px;
 	width: 158px;
 	height: 50px;
 	cursor: pointer;
@@ -96,7 +96,7 @@ select {
 #numOfImages {
 	position: absolute;
 	left: 828px;
-	top: 800px;
+	top: 900px;
 	width: 158px;
 	height: 50px;
 	cursor: pointer;

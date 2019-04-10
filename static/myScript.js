@@ -51,6 +51,49 @@ var jsonObj = {
 	creditor: null
 }
 
+var resetBuffers = function(){
+	topLHoleBuffer = createRingBuffer(4)
+	topLHoleBuffer.push("20")
+	topLHoleBuffer.push("21")
+	topLHoleBuffer.push("22")
+	topLHoleBuffer.push("23")
+
+	topRHoleBuffer = createRingBuffer(4)
+	topRHoleBuffer.push("24")
+	topRHoleBuffer.push("25")
+	topRHoleBuffer.push("26")
+	topRHoleBuffer.push("27")
+
+	fullBoardBuffer= createRingBuffer(4)
+	fullBoardBuffer.push("28")
+	fullBoardBuffer.push("29")
+	fullBoardBuffer.push("30")
+	fullBoardBuffer.push("31")
+
+	bottomHoleBuffer = createRingBuffer(4)
+	bottomHoleBuffer.push("32")
+	bottomHoleBuffer.push("33")
+	bottomHoleBuffer.push("34")
+	bottomHoleBuffer.push("35")
+
+	holeBuffer = createRingBuffer(4)
+	holeBuffer.push("11")
+	holeBuffer.push("12")
+	holeBuffer.push("13")
+	holeBuffer.push("14")
+
+	gateBuffer = createRingBuffer(4)
+	gateBuffer.push("15")
+	gateBuffer.push("16")
+	gateBuffer.push("17")
+	gateBuffer.push("18")
+
+	fruitBuffer = createRingBuffer(3)
+	fruitBuffer.push("8")
+	fruitBuffer.push("9")
+	fruitBuffer.push("10")
+}
+
 var topLHoleBuffer = createRingBuffer(4)
 topLHoleBuffer.push("20")
 topLHoleBuffer.push("21")
@@ -118,8 +161,20 @@ function myKeyPress(e){
     }else if(s.localeCompare("r") == 0){
         var option = bottomHoleBuffer.next()
         document.getElementById("dropdown").selectedIndex = Number(option) - 1
-    }else if(["1", "2", "3", "4", "5", "6"].indexOf(s) >-1){
-        document.getElementById("dropdown").selectedIndex = Number(s) - 1
+    }else if(["1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(s) >-1){
+		if (s.localeCompare("7") == 0){
+			console.log("Pressed 7")
+			document.getElementById("dropdown").selectedIndex = 35
+			
+		}else if (s.localeCompare("8") == 0){
+			console.log("Pressed 7")
+			document.getElementById("dropdown").selectedIndex = 36
+		}else if (s.localeCompare("9") == 0){
+			console.log("Pressed 7")
+			document.getElementById("dropdown").selectedIndex = 37
+		}else{
+			document.getElementById("dropdown").selectedIndex = Number(s) - 1
+		}
     }else if(s.localeCompare("s") == 0){
         var option = holeBuffer.next()
         document.getElementById("dropdown").selectedIndex = Number(option) - 1
@@ -129,7 +184,10 @@ function myKeyPress(e){
     }else if(s.localeCompare("d") == 0){
         var option = fruitBuffer.next()
         document.getElementById("dropdown").selectedIndex = Number(option) - 1
-    }
+    }else if(s.localeCompare("z") == 0){
+		jsonObj['labels'].pop();
+		document.getElementById('canvas').redraw()
+	}
 }
 
 
@@ -140,6 +198,7 @@ ws.onmessage = function (event) {
 	if("Data".localeCompare(event.data.slice(0,4)) == 0){
 		var isPictureID = "ID".localeCompare(event.data.slice(5,7))
 		if(isPictureID == 0){
+			resetBuffers()
 			workingPictureID = event.data.slice(8, event.data.length)
 			jsonObj["pictureID"] = workingPictureID;
 		}else{
@@ -148,7 +207,7 @@ ws.onmessage = function (event) {
 			var canvas = document.getElementById("canvas")
 			canvas.style.background = "url('" + src + "')"
 		}
-	}else if("Labels".localeCompare(event.data.slice(0,7)) == 0){
+	}else if("Labels".localeCompare(event.data.slice(0,6)) == 0){
         labs = event.data.split(" ")
         console.log("Got Labels:")
         var dat = [Number(labs[1]), Number(labs[2]), Number(labs[3]), Number(labs[4]), Number(labs[5])]

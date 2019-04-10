@@ -1,5 +1,6 @@
-./labeledImages
-./unlabeledImages
-./labels
+labeledImages/*
+unlabeledImages/*
+labels/*
 *.png
 static/images/3446.jpg
+
